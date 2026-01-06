@@ -8,25 +8,20 @@ repository = "https://github.com/yourusername/blockchain-ide"
 edition = "2021"
 
 [build-dependencies]
-tauri-build = { version = "2", features = [] }
+tauri-build = { version = "2.5.3", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+tauri = { version = "2.9.5", features = [] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 serde_with = "3.0"
 
-# Blockchain & EVM
-revm = { version = "4.0", features = ["optimism"] }
-web3 = { version = "0.18", features = ["http"] }
-solana-client = "1.15"
-solana-sdk = "1.15"
+# Blockchain & EVM (added back once pinned to Rust/Cargo compatibility)
 
 # IPFS
 reqwest = { version = "0.11", features = ["json"] }
 
-# Plugin system
-wasmer = { version = "3.0", features = ["cranelift", "wasi"] }
+# Plugin system (WASM execution will be added later)
 sha2 = "0.10"
 hex = "0.4"
 
@@ -41,5 +36,5 @@ chrono = { version = "0.4", default-features = false, features = ["clock"] }
 default = []
 
 [dev-dependencies]
-tauri = { version = "2", features = [] }
+tauri = { version = "2.9.5", features = [] }
 

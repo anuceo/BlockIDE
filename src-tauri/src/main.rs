@@ -1,12 +1,12 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-mod commands;
 mod differential_analyzer;
 mod evm;
 mod ipfs_client;
 mod plugin_verifier;
 mod utils;
 
+use tauri::Manager;
 use tauri::WindowEvent;
 
 #[tauri::command]
@@ -45,8 +45,8 @@ fn main() {
       app.manage(ipfs_client::IPFSClient::new("http://localhost:5001"));
       Ok(())
     })
-    .on_window_event(|event| {
-      if let WindowEvent::CloseRequested { .. } = event.event() {
+    .on_window_event(|_window, event| {
+      if let WindowEvent::CloseRequested { .. } = event {
         log::info!("Cleaning up resources...");
       }
     })

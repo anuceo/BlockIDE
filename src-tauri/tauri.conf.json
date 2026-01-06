@@ -26,12 +26,8 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all"
-  },
-  "plugins": {
-    "shell": {
-      "open": true
-    }
+    "targets": "all",
+    "icon": []
   }
 }
 

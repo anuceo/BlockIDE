@@ -5,16 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest",
     "lint": "eslint .",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",
     "@tanstack/react-query": "^5.62.8",
-    "@tauri-apps/api": "^1.6.0",
+    "@tauri-apps/api": "^2.0.0",
     "ethers": "^6.13.5",
     "monaco-editor": "^0.52.2",
     "react": "^18.3.1",
@@ -22,7 +24,7 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^1.6.3",
+    "@tauri-apps/cli": "^2.0.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",

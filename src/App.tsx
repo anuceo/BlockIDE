@@ -46,7 +46,6 @@ contract HelloWorld {
   const [activeChain, setActiveChain] = useState<string>('local')
   const [rpcUrl, setRpcUrl] = useState<string>(DEFAULT_LOCAL_RPC)
   const [privateKey, setPrivateKey] = useState<string>('')
-  const [chainIdNumber, setChainIdNumber] = useState<number>(CHAIN_ID_MAP.local)
   const [deploymentStatus, setDeploymentStatus] = useState<string>('')
   const [deployedAddress, setDeployedAddress] = useState<string>('')
 
@@ -56,7 +55,6 @@ contract HelloWorld {
       setIsConnected(true)
       setActiveChain(connection.chain.id)
       setRpcUrl(connection.chain.rpcUrls?.[0] ?? 'https://eth.llamarpc.com')
-      setChainIdNumber(CHAIN_ID_MAP[connection.chain.id] ?? CHAIN_ID_MAP.ethereum)
     },
     [],
   )
@@ -96,7 +94,7 @@ contract HelloWorld {
   const handleConnectWallet = async () => {
     try {
       if (activeChain === 'local') {
-        alert('Wallet connect is for public chains. Use Local Chains tab + private key for local dev.')
+        alert('Wallet connect is for public chains. Use Local Chains + a test private key for local dev.')
         return
       }
       await WalletService.connectEthereum(activeChain)
@@ -133,7 +131,7 @@ contract HelloWorld {
 
     try {
       const contract = compilationResult.contracts[contractName]
-      setDeploymentStatus('Deploying…')
+      setDeploymentStatus('Deploying...')
       setDeployedAddress('')
 
       if (isConnected && walletAddress) {
@@ -152,16 +150,17 @@ contract HelloWorld {
           chain_id: CHAIN_ID_MAP.local,
         })
         setDeployedAddress(result.address)
-        setDeploymentStatus(`Deployed successfully to local chain! Tx: ${result.tx_hash}`)
+        setDeploymentStatus('Deployed successfully to local chain!')
       } else {
+        const chain_id = CHAIN_ID_MAP[activeChain] ?? 1
         const result = await invoke<any>('deploy_contract', {
           bytecode: contract.bin,
           rpc_url: rpcUrl,
           private_key: privateKey.trim(),
-          chain_id: chainIdNumber,
+          chain_id,
         })
         setDeployedAddress(result.address)
-        setDeploymentStatus(`Deployed successfully! Tx: ${result.tx_hash}`)
+        setDeploymentStatus('Deployed successfully!')
       }
     } catch (error: any) {
       console.error('Deployment error:', error)
@@ -187,10 +186,10 @@ contract HelloWorld {
       // getGreeting() selector
       const result = await invoke<any>('simulate_contract_execution', {
         bytecode: contract.bin,
-        data: '0x6d4ce63c',
-        value: '0x0',
+        data: '6d4ce63c',
+        value: '0',
         caller: '0x0000000000000000000000000000000000000000',
-        gas_limit: 1_000_000,
+        gas_limit: 1000000,
       })
       alert(`Simulation ${result.success ? 'successful' : 'failed'}: ${result.output}`)
     } catch (error: any) {
@@ -202,7 +201,7 @@ contract HelloWorld {
   return (
     <div className="app">
       <header className="header">
-        <h1>Blockchain IDE</h1>
+        <h1>🚀 Blockchain IDE</h1>
         <div className="header-actions">
           <div className="tabs">
             <button className={`tab ${activeTab === 'editor' ? 'active' : ''}`} onClick={() => setActiveTab('editor')}>
@@ -235,8 +234,10 @@ contract HelloWorld {
       <main className="main">
         {activeTab === 'nodes' ? (
           <NodeManager
-            onUseRpcUrl={(u) => setRpcUrl(u)}
-            onUseChainId={(id) => setChainIdNumber(id)}
+            onUseRpcUrl={(u) => {
+              setRpcUrl(u)
+              setActiveChain('local')
+            }}
             onUsePrivateKey={(pk) => setPrivateKey(pk)}
           />
         ) : (
@@ -264,12 +265,14 @@ contract HelloWorld {
                 <div className="config-grid">
                   <div className="config-item">
                     <label>Target Chain:</label>
-                    <select value={activeChain} onChange={(e) => {
-                      const next = e.target.value
-                      setActiveChain(next)
-                      setChainIdNumber(CHAIN_ID_MAP[next] ?? 1)
-                      if (next === 'local') setRpcUrl(DEFAULT_LOCAL_RPC)
-                    }}>
+                    <select
+                      value={activeChain}
+                      onChange={(e) => {
+                        const next = e.target.value
+                        setActiveChain(next)
+                        if (next === 'local') setRpcUrl(DEFAULT_LOCAL_RPC)
+                      }}
+                    >
                       <option value="local">Local Development Chain</option>
                       <option value="ethereum">Ethereum Mainnet</option>
                       <option value="polygon">Polygon</option>
@@ -338,6 +341,12 @@ contract HelloWorld {
                               <span>Bytecode: {contract.bin.length} bytes</span>
                               <span>ABI: {contract.abi?.length || 0} items</span>
                             </div>
+                            {contract.abi && (
+                              <div className="abi-preview">
+                                <h5>ABI Preview:</h5>
+                                <pre>{JSON.stringify(contract.abi.slice(0, 3), null, 2)}...</pre>
+                              </div>
+                            )}
                           </li>
                         ))}
                       </ul>

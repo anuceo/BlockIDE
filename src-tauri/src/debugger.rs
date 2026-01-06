@@ -20,6 +20,66 @@ use std::{
 };
 use tauri::State;
 
+#[derive(Debug, Clone, Deserialize)]
+pub struct CreateDebugSessionArgs {
+  pub bytecode: String,
+  #[serde(default, alias = "initialData", alias = "initial_data")]
+  pub initial_data: String,
+  #[serde(default)]
+  pub value: String,
+  #[serde(default)]
+  pub caller: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct ExecuteStepArgs {
+  #[serde(alias = "sessionId", alias = "session_id")]
+  pub session_id: String,
+  pub steps: u32,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct SetBreakpointArgs {
+  #[serde(alias = "sessionId", alias = "session_id")]
+  pub session_id: String,
+  pub line: u32,
+  #[serde(default)]
+  pub condition: Option<String>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct RemoveBreakpointArgs {
+  #[serde(alias = "sessionId", alias = "session_id")]
+  pub session_id: String,
+  pub line: u32,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct InspectVariableArgs {
+  #[serde(alias = "sessionId", alias = "session_id")]
+  pub session_id: String,
+  #[serde(alias = "variableName", alias = "variable_name")]
+  pub variable_name: String,
+  pub depth: usize,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct MemoryDumpArgs {
+  #[serde(alias = "sessionId", alias = "session_id")]
+  pub session_id: String,
+  pub offset: u64,
+  pub length: u64,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct StorageDumpArgs {
+  #[serde(alias = "sessionId", alias = "session_id")]
+  pub session_id: String,
+  #[serde(alias = "contractAddress", alias = "contract_address")]
+  pub contract_address: String,
+  pub slot: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DebugStep {
   pub pc: u64,
@@ -201,10 +261,7 @@ where
 #[tauri::command]
 pub async fn create_debug_session(
   state: State<'_, DebuggerManager>,
-  bytecode: String,
-  initial_data: String,
-  value: String,
-  caller: String,
+  args: CreateDebugSessionArgs,
 ) -> Result<DebugSession, String> {
   let session_id = format!(
     "debug_{}",
@@ -214,12 +271,12 @@ pub async fn create_debug_session(
       .as_nanos()
   );
 
-  let mut initcode = decode_hex_allow_0x(&bytecode)?;
-  let constructor_data = decode_hex_allow_0x(&initial_data).unwrap_or_default();
+  let mut initcode = decode_hex_allow_0x(&args.bytecode)?;
+  let constructor_data = decode_hex_allow_0x(&args.initial_data).unwrap_or_default();
   initcode.extend_from_slice(&constructor_data);
 
-  let caller_addr = parse_address(&caller)?;
-  let value_u256 = parse_u256_hex(&value);
+  let caller_addr = parse_address(&args.caller)?;
+  let value_u256 = parse_u256_hex(&args.value);
 
   let ctx = revm::Context::mainnet().with_db(InMemoryDB::default());
   let evm = ctx.build_mainnet();
@@ -275,7 +332,7 @@ pub async fn create_debug_session(
   };
 
   let internal = SessionInternal {
-    bytecode: bytecode.clone(),
+    bytecode: args.bytecode.clone(),
     deployed_address: deployed_addr.clone(),
     trace: steps,
     cursor: 0,
@@ -295,7 +352,7 @@ pub async fn create_debug_session(
 
   Ok(DebugSession {
     session_id: session_id.clone(),
-    bytecode,
+    bytecode: args.bytecode,
     deployed_address: deployed_addr,
     breakpoints: Vec::new(),
     current_step: None,
@@ -307,18 +364,17 @@ pub async fn create_debug_session(
 #[tauri::command]
 pub async fn execute_step(
   state: State<'_, DebuggerManager>,
-  session_id: String,
-  steps: u32,
+  args: ExecuteStepArgs,
 ) -> Result<DebugResult, String> {
   let mut sessions = state
     .sessions
     .lock()
     .map_err(|_| "Session mutex poisoned".to_string())?;
   let sess = sessions
-    .get_mut(&session_id)
+    .get_mut(&args.session_id)
     .ok_or_else(|| "Unknown debug session".to_string())?;
 
-  let n = steps.max(1) as usize;
+  let n = args.steps.max(1) as usize;
   let start = sess.cursor.min(sess.trace.len());
   let end = (start + n).min(sess.trace.len());
   let chunk = sess.trace[start..end].to_vec();
@@ -327,7 +383,7 @@ pub async fn execute_step(
   sess.completed = sess.cursor >= sess.trace.len();
 
   Ok(DebugResult {
-    session_id,
+    session_id: args.session_id,
     steps: chunk,
     final_output: sess.final_output.clone(),
     gas_used: sess.gas_used,
@@ -339,25 +395,23 @@ pub async fn execute_step(
 #[tauri::command]
 pub async fn set_breakpoint(
   state: State<'_, DebuggerManager>,
-  session_id: String,
-  line: u32,
-  condition: Option<String>,
+  args: SetBreakpointArgs,
 ) -> Result<bool, String> {
   let mut sessions = state
     .sessions
     .lock()
     .map_err(|_| "Session mutex poisoned".to_string())?;
   let sess = sessions
-    .get_mut(&session_id)
+    .get_mut(&args.session_id)
     .ok_or_else(|| "Unknown debug session".to_string())?;
 
   let bp = Breakpoint {
-    line,
+    line: args.line,
     enabled: true,
-    condition,
+    condition: args.condition,
   };
 
-  sess.breakpoints.retain(|b| b.line != line);
+  sess.breakpoints.retain(|b| b.line != args.line);
   sess.breakpoints.push(bp);
   Ok(true)
 }
@@ -365,45 +419,41 @@ pub async fn set_breakpoint(
 #[tauri::command]
 pub async fn remove_breakpoint(
   state: State<'_, DebuggerManager>,
-  session_id: String,
-  line: u32,
+  args: RemoveBreakpointArgs,
 ) -> Result<bool, String> {
   let mut sessions = state
     .sessions
     .lock()
     .map_err(|_| "Session mutex poisoned".to_string())?;
   let sess = sessions
-    .get_mut(&session_id)
+    .get_mut(&args.session_id)
     .ok_or_else(|| "Unknown debug session".to_string())?;
-  sess.breakpoints.retain(|b| b.line != line);
+  sess.breakpoints.retain(|b| b.line != args.line);
   Ok(true)
 }
 
 #[tauri::command]
 pub async fn inspect_variable(
   _state: State<'_, DebuggerManager>,
-  session_id: String,
-  variable_name: String,
-  depth: usize,
+  args: InspectVariableArgs,
 ) -> Result<String, String> {
   Ok(format!(
-    "Variable {variable_name} at depth {depth} in session {session_id}: [inspection not implemented]"
+    "Variable {} at depth {} in session {}: [inspection not implemented]",
+    args.variable_name, args.depth, args.session_id
   ))
 }
 
 #[tauri::command]
 pub async fn get_memory_dump(
   state: State<'_, DebuggerManager>,
-  session_id: String,
-  offset: u64,
-  length: u64,
+  args: MemoryDumpArgs,
 ) -> Result<Vec<String>, String> {
   let sessions = state
     .sessions
     .lock()
     .map_err(|_| "Session mutex poisoned".to_string())?;
   let sess = sessions
-    .get(&session_id)
+    .get(&args.session_id)
     .ok_or_else(|| "Unknown debug session".to_string())?;
 
   // Return memory for the current cursor-1 step (most recently produced step).
@@ -416,7 +466,8 @@ pub async fn get_memory_dump(
 
   let mut out = Vec::with_capacity(2 + mem.len());
   out.push(format!(
-    "Session {session_id} memory dump offset {offset} length {length} (view is chunked 32B; captured during tracing)"
+    "Session {} memory dump offset {} length {} (view is chunked 32B; captured during tracing)",
+    args.session_id, args.offset, args.length
   ));
   out.push(format!("Captured chunks: {}", mem.len()));
   out.extend(mem);
@@ -426,12 +477,11 @@ pub async fn get_memory_dump(
 #[tauri::command]
 pub async fn get_storage_dump(
   _state: State<'_, DebuggerManager>,
-  session_id: String,
-  contract_address: String,
-  slot: String,
+  args: StorageDumpArgs,
 ) -> Result<String, String> {
   Ok(format!(
-    "Session {session_id} storage slot {slot} at {contract_address}: [storage inspection not implemented]"
+    "Session {} storage slot {} at {}: [storage inspection not implemented]",
+    args.session_id, args.slot, args.contract_address
   ))
 }
 

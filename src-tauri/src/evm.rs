@@ -36,10 +36,13 @@ pub struct GasEstimation {
 #[tauri::command]
 pub async fn deploy_contract(
   bytecode: String,
-  _value: Option<String>,
+  value: Option<String>,
   gas_limit: Option<u64>,
 ) -> Result<ContractDeployment, String> {
   log::info!("Deploying contract with bytecode length: {}", bytecode.len());
+  if let Some(v) = value.as_deref() {
+    log::info!("Deploy value provided (ignored in mock): {}", v);
+  }
 
   // Generate mock contract address
   let address = format!("0x{}", hex::encode(rand::random::<[u8; 20]>()))
@@ -57,7 +60,7 @@ pub async fn deploy_contract(
 pub async fn execute_contract(
   contract_address: String,
   calldata: String,
-  _value: Option<String>,
+  value: Option<String>,
   gas_limit: Option<u64>,
 ) -> Result<ContractExecution, String> {
   log::info!(
@@ -65,6 +68,9 @@ pub async fn execute_contract(
     contract_address,
     calldata
   );
+  if let Some(v) = value.as_deref() {
+    log::info!("Call value provided (ignored in mock): {}", v);
+  }
 
   // Mock execution: return "true" in ABI-encoded form
   Ok(ContractExecution {

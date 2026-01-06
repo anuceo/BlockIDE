@@ -155,7 +155,7 @@ export const SmartContractEditor: React.FC = () => {
           { include: '@numbers' },
           { include: '@strings' },
           { include: '@comments' },
-          [/[{}()\[\]]/, '@brackets'],
+          [/[\\]{}()[[]/, '@brackets'],
           [
             /@symbols/,
             {
@@ -170,7 +170,7 @@ export const SmartContractEditor: React.FC = () => {
         numbers: [[/\d+/, 'number']],
         strings: [[/["']/, { token: 'string.quote', bracket: '@open', next: '@string' }]],
         string: [
-          [/[^\\\"'$]+/, 'string'],
+          [/[^"'\\$]+/, 'string'],
           [/\\./, 'string.escape.invalid'],
           [/["']/, { token: 'string.quote', bracket: '@close', next: '@pop' }],
         ],

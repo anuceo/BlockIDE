@@ -12,7 +12,8 @@
     "tauri:build": "tauri build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "type-check": "tsc --noEmit",
-    "setup": "npm install && cd src-tauri && cargo build"
+    "setup": "npm install && cd src-tauri && cargo build",
+    "clean": "rm -rf node_modules dist && cd src-tauri && cargo clean"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
@@ -31,6 +32,8 @@
     "@types/node": "^22.10.7",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
+    "@typescript-eslint/eslint-plugin": "^8.52.0",
+    "@typescript-eslint/parser": "^8.52.0",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.1",

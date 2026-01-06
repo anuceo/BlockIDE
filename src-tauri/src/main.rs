@@ -71,8 +71,8 @@ fn main() {
 
             Ok(())
         })
-        .on_window_event(|event| {
-            if let WindowEvent::CloseRequested { .. } = event.event() {
+        .on_window_event(|_window, event| {
+            if let WindowEvent::CloseRequested { .. } = event {
                 log::info!("Cleaning up resources...");
             }
         })

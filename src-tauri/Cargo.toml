@@ -8,18 +8,19 @@ repository = "https://github.com/blockchain-ide/blockchain-ide"
 edition = "2021"
 
 [build-dependencies]
-tauri-build = "2.5.1"
+tauri-build = "2.5.3"
 
 [dependencies]
-tauri = "2.5.1"
+tauri = { version = "2.9.5" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 serde_with = "3.0"
 
 # Blockchain & EVM
-# Note: these are intentionally omitted for now to keep builds compatible with the
-# Rust toolchain available in this environment. The backend modules are stubbed
-# and can be wired to real chains once the toolchain/deps are pinned appropriately.
+revm = { version = "6.0.0", features = ["optimism", "serde"], optional = true }
+web3 = { version = "0.19", features = ["http"], optional = true }
+solana-client = { version = "2.0", optional = true }
+solana-sdk = { version = "2.0", optional = true }
 
 # IPFS
 reqwest = { version = "0.12", features = ["json", "blocking"] }
@@ -39,9 +40,8 @@ chrono = "0.4"
 # File system
 tempfile = "3.8"
 
-# Pin to a Cargo-1.82-compatible release (avoids crates requiring edition2024)
-dlopen2 = "=0.8.0"
-
 [features]
 default = []
+evm = ["revm", "web3"]
+solana = ["solana-client", "solana-sdk"]
 

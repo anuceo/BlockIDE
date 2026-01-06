@@ -4,6 +4,13 @@ import { WalletService, type WalletConnection } from './services/blockchain/Wall
 import { SolidityCompiler, type CompilationResult } from './services/compiler/SolidityCompiler'
 import './App.css'
 
+const CHAIN_ID_MAP: Record<string, number> = {
+  ethereum: 1,
+  polygon: 137,
+  bsc: 56,
+  'ethereum-sepolia': 11155111,
+}
+
 function App() {
   const [code, setCode] = useState<string>(`// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
@@ -26,12 +33,17 @@ contract HelloWorld {
   const [walletAddress, setWalletAddress] = useState<string>('')
   const [isConnected, setIsConnected] = useState(false)
   const [activeChain, setActiveChain] = useState<string>('ethereum')
+  const [rpcUrl, setRpcUrl] = useState<string>('https://eth.llamarpc.com')
+  const [privateKey, setPrivateKey] = useState<string>('')
+  const [deploymentStatus, setDeploymentStatus] = useState<string>('')
+  const [deployedAddress, setDeployedAddress] = useState<string>('')
 
   const walletConnectedCb = useMemo(
     () => (connection: WalletConnection) => {
       setWalletAddress(connection.address)
       setIsConnected(true)
       setActiveChain(connection.chain.id)
+      setRpcUrl(connection.chain.rpcUrls?.[0] ?? 'https://eth.llamarpc.com')
     },
     [],
   )
@@ -80,6 +92,7 @@ contract HelloWorld {
   const handleDisconnectWallet = async () => {
     try {
       await WalletService.disconnect(activeChain)
+      setPrivateKey('')
     } catch (error) {
       console.error('Failed to disconnect wallet:', error)
     }
@@ -90,8 +103,8 @@ contract HelloWorld {
       alert('Please compile the contract first')
       return
     }
-    if (!isConnected) {
-      alert('Please connect your wallet first')
+    if (!privateKey && !isConnected) {
+      alert('Please either connect a wallet or provide a private key')
       return
     }
 
@@ -103,15 +116,60 @@ contract HelloWorld {
 
     try {
       const contract = compilationResult.contracts[contractName]
-      const result = await invoke<any>('deploy_contract', {
-        bytecode: contract.bin,
-        value: '0',
-        gas_limit: 1000000,
-      })
-      alert(`Contract deployed at: ${result.address}`)
+      setDeploymentStatus('Deploying…')
+      setDeployedAddress('')
+
+      if (isConnected && walletAddress) {
+        const txHash = await WalletService.sendTransaction(activeChain, {
+          from: walletAddress,
+          data: `0x${contract.bin}`,
+          gas: '0x300000',
+          value: '0x0',
+        })
+        setDeploymentStatus(`Transaction sent: ${txHash}`)
+      } else {
+        const result = await invoke<any>('deploy_contract', {
+          bytecode: contract.bin,
+          rpc_url: rpcUrl,
+          private_key: privateKey,
+          chain_id: CHAIN_ID_MAP[activeChain] ?? 1,
+        })
+        setDeployedAddress(result.address)
+        setDeploymentStatus(`Deployed successfully! Tx: ${result.tx_hash}`)
+      }
     } catch (error: any) {
       console.error('Deployment error:', error)
+      setDeploymentStatus(`Deployment failed: ${error?.message ?? String(error)}`)
       alert(`Deployment failed: ${error?.message ?? String(error)}`)
+    }
+  }
+
+  const handleSimulate = async () => {
+    if (!compilationResult?.success) {
+      alert('Please compile the contract first')
+      return
+    }
+
+    const contractName = Object.keys(compilationResult.contracts)[0]
+    if (!contractName) {
+      alert('No compiled contract found')
+      return
+    }
+
+    try {
+      const contract = compilationResult.contracts[contractName]
+      // getGreeting() selector
+      const result = await invoke<any>('simulate_contract_execution', {
+        bytecode: contract.bin,
+        data: '0x6d4ce63c',
+        value: '0x0',
+        caller: '0x0000000000000000000000000000000000000000',
+        gas_limit: 1_000_000,
+      })
+      alert(`Simulation ${result.success ? 'successful' : 'failed'}: ${result.output}`)
+    } catch (error: any) {
+      console.error('Simulation error:', error)
+      alert(`Simulation failed: ${error?.message ?? String(error)}`)
     }
   }
 
@@ -152,12 +210,15 @@ contract HelloWorld {
               <button onClick={handleCompile} className="btn btn-compile" disabled={isCompiling}>
                 {isCompiling ? 'Compiling…' : 'Compile'}
               </button>
+              <button onClick={handleSimulate} className="btn btn-simulate" disabled={!compilationResult?.success}>
+                Simulate
+              </button>
               <button
                 onClick={handleDeploy}
                 className="btn btn-deploy"
-                disabled={!compilationResult?.success || !isConnected}
+                disabled={!compilationResult?.success}
               >
-                Deploy (mock)
+                Deploy
               </button>
             </div>
           </div>
@@ -169,6 +230,45 @@ contract HelloWorld {
             rows={20}
             spellCheck={false}
           />
+
+          <div className="config-section">
+            <h3>Deployment Configuration</h3>
+            <div className="config-grid">
+              <div className="config-item">
+                <label>RPC URL</label>
+                <input value={rpcUrl} onChange={(e) => setRpcUrl(e.target.value)} placeholder="https://eth.llamarpc.com" />
+              </div>
+              <div className="config-item">
+                <label>Private Key (optional)</label>
+                <input
+                  type="password"
+                  value={privateKey}
+                  onChange={(e) => setPrivateKey(e.target.value)}
+                  placeholder="0x..."
+                />
+              </div>
+              <div className="config-item">
+                <label>Chain</label>
+                <select value={activeChain} onChange={(e) => setActiveChain(e.target.value)}>
+                  <option value="ethereum">Ethereum</option>
+                  <option value="polygon">Polygon</option>
+                  <option value="bsc">BNB Smart Chain</option>
+                  <option value="ethereum-sepolia">Ethereum Sepolia</option>
+                </select>
+              </div>
+            </div>
+
+            {deploymentStatus && (
+              <div className="deployment-status">
+                {deploymentStatus}
+                {deployedAddress && (
+                  <div className="deployed-address">
+                    Contract: <code>{deployedAddress}</code>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="results-section">

@@ -1,4 +1,7 @@
+use ethers::prelude::*;
+use ethers::types::transaction::eip2718::TypedTransaction;
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DeployedContract {
@@ -15,6 +18,14 @@ pub struct ContractDeployment {
   pub bytecode: String,
   pub gas_used: u64,
   pub transaction_hash: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeploymentResult {
+  pub address: String,
+  pub tx_hash: String,
+  pub gas_used: u64,
+  pub block_number: u64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -36,23 +47,50 @@ pub struct GasEstimation {
 #[tauri::command]
 pub async fn deploy_contract(
   bytecode: String,
-  value: Option<String>,
-  gas_limit: Option<u64>,
-) -> Result<ContractDeployment, String> {
-  log::info!("Deploying contract with bytecode length: {}", bytecode.len());
-  if let Some(v) = value.as_deref() {
-    log::info!("Deploy value provided (ignored in mock): {}", v);
-  }
+  rpc_url: String,
+  private_key: String,
+  chain_id: u64,
+) -> Result<DeploymentResult, String> {
+  let bytecode_clean = bytecode.strip_prefix("0x").unwrap_or(bytecode.as_str());
+  let bytecode_bytes =
+    hex::decode(bytecode_clean).map_err(|e| format!("Invalid bytecode: {e}"))?;
 
-  // Generate mock contract address
-  let address = format!("0x{}", hex::encode(rand::random::<[u8; 20]>()))
-    .to_lowercase();
+  let provider = Provider::<Http>::try_from(rpc_url.as_str())
+    .map_err(|e| format!("Failed to connect to RPC: {e}"))?
+    .interval(std::time::Duration::from_millis(50));
 
-  Ok(ContractDeployment {
-    address,
-    bytecode,
-    gas_used: gas_limit.unwrap_or(1_000_000),
-    transaction_hash: format!("0x{}", hex::encode(rand::random::<[u8; 32]>())).to_lowercase(),
+  let wallet: LocalWallet = private_key
+    .parse::<LocalWallet>()
+    .map_err(|e| format!("Invalid private key: {e}"))?
+    .with_chain_id(chain_id);
+
+  let client = SignerMiddleware::new(provider, wallet);
+  let client = Arc::new(client);
+
+  let tx: TypedTransaction = TransactionRequest::new()
+    .data(Bytes::from(bytecode_bytes))
+    .gas(3_000_000u64)
+    .into();
+
+  let pending_tx = client
+    .send_transaction(tx, None)
+    .await
+    .map_err(|e| format!("Failed to send transaction: {e}"))?;
+
+  let receipt = pending_tx
+    .await
+    .map_err(|e| format!("Transaction failed: {e}"))?
+    .ok_or_else(|| "Transaction receipt not found".to_string())?;
+
+  let contract_address = receipt
+    .contract_address
+    .ok_or_else(|| "No contract address in receipt".to_string())?;
+
+  Ok(DeploymentResult {
+    address: format!("{contract_address:?}"),
+    tx_hash: format!("{:?}", receipt.transaction_hash),
+    gas_used: receipt.gas_used.unwrap_or_default().as_u64(),
+    block_number: receipt.block_number.unwrap_or_default().as_u64(),
   })
 }
 

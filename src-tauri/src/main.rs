@@ -2,6 +2,7 @@
 
 mod compiler;
 mod evm;
+mod evm_simulator;
 mod utils;
 
 fn main() {
@@ -14,6 +15,8 @@ fn main() {
       evm::deploy_contract,
       evm::execute_contract,
       evm::estimate_gas,
+      // EVM simulation
+      evm_simulator::simulate_contract_execution,
       // Utility commands
       utils::get_network_status,
       utils::check_wallet_connection,

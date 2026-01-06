@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/core'
 import { useEffect, useMemo, useState } from 'react'
+import { Debugger } from './components/Debugger'
 import { NodeManager } from './components/NodeManager'
 import { SecurityAnalyzer } from './components/SecurityAnalyzer'
 import { WalletService, type WalletConnection } from './services/blockchain/WalletService'
@@ -19,10 +20,10 @@ const DEFAULT_LOCAL_RPC = 'http://127.0.0.1:8545'
 const DEFAULT_LOCAL_PRIVATE_KEY =
   '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
-type Tab = 'editor' | 'nodes'
+type Tab = 'editor' | 'nodes' | 'security' | 'debugger'
 
 function App() {
-  const [activeTab, setActiveTab] = useState<Tab | 'security'>('editor')
+  const [activeTab, setActiveTab] = useState<Tab>('editor')
 
   const [code, setCode] = useState<string>(`// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
@@ -228,6 +229,9 @@ contract HelloWorld {
             <button className={`tab ${activeTab === 'security' ? 'active' : ''}`} onClick={() => setActiveTab('security')}>
               Security
             </button>
+            <button className={`tab ${activeTab === 'debugger' ? 'active' : ''}`} onClick={() => setActiveTab('debugger')}>
+              Debugger
+            </button>
           </div>
 
           <div className="wallet-section">
@@ -260,6 +264,8 @@ contract HelloWorld {
           />
         ) : activeTab === 'security' ? (
           <SecurityAnalyzer code={code} onVulnerabilityClick={handleVulnerabilityClick} />
+        ) : activeTab === 'debugger' ? (
+          <Debugger code={code} compilationResult={compilationResult} />
         ) : (
           <>
             <div className="editor-section">
@@ -277,6 +283,9 @@ contract HelloWorld {
                   </button>
                   <button onClick={() => setActiveTab('security')} className="btn btn-security">
                     Security Scan
+                  </button>
+                  <button onClick={() => setActiveTab('debugger')} className="btn btn-debugger" disabled={!compilationResult?.success}>
+                    Debugger
                   </button>
                 </div>
               </div>

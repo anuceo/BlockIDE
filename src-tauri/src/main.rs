@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod compiler;
+mod debugger;
 mod evm;
 mod evm_simulator;
 mod node_manager;
@@ -15,6 +16,7 @@ fn main() {
   tauri::Builder::default()
     .setup(|app| {
       app.manage(node_manager::NodeManager::new(app.handle().clone()));
+      app.manage(debugger::DebuggerManager::default());
       Ok(())
     })
     .invoke_handler(tauri::generate_handler![
@@ -25,6 +27,14 @@ fn main() {
       evm::estimate_gas,
       // EVM simulation
       evm_simulator::simulate_contract_execution,
+      // Debugger
+      debugger::create_debug_session,
+      debugger::execute_step,
+      debugger::set_breakpoint,
+      debugger::remove_breakpoint,
+      debugger::inspect_variable,
+      debugger::get_memory_dump,
+      debugger::get_storage_dump,
       // Node management
       node_manager::start_ganache,
       node_manager::start_anvil,

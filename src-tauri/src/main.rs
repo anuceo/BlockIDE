@@ -6,6 +6,7 @@ mod evm;
 mod evm_simulator;
 mod node_manager;
 mod security_analyzer;
+mod testing;
 mod utils;
 
 use tauri::Manager;
@@ -43,6 +44,8 @@ fn main() {
       node_manager::get_default_accounts,
       // Security analysis
       security_analyzer::analyze_security,
+      // Testing
+      testing::run_tests,
       // Utility commands
       utils::get_network_status,
       utils::check_wallet_connection,

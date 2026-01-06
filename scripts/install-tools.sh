@@ -26,6 +26,10 @@ foundryup
 echo "Installing solc..."
 npm install -g solc
 
+# Install testing frameworks
+echo "Installing testing frameworks..."
+npm install -g hardhat truffle
+
 # Install security tools
 echo "Installing security tools..."
 npm install -g solhint
@@ -37,6 +41,8 @@ echo "Available tools:"
 echo "  - Ganache: ganache --version"
 echo "  - Anvil: anvil --version"
 echo "  - solcjs: solcjs --version"
+echo "  - Hardhat: npx hardhat --version"
+echo "  - Truffle: npx truffle version"
 echo "  - Slither: slither --version"
 echo "  - Mythril: myth --version"
 

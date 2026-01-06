@@ -1098,6 +1098,16 @@ body {
   background: #7c3aed;
 }
 
+/* Testing button */
+.btn-testing {
+  background: #f59e0b;
+  color: white;
+}
+
+.btn-testing:hover:not(:disabled) {
+  background: #d97706;
+}
+
 /* Debugger Styles */
 .debugger-start {
   background: #1e293b;
@@ -1595,5 +1605,340 @@ body {
     grid-template-columns: 1fr;
     height: auto;
   }
+}
+
+/* Testing Framework Styles */
+.test-runner {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  grid-column: 1 / -1;
+}
+
+.test-header {
+  margin-bottom: 1.5rem;
+}
+
+.test-header h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.125rem;
+  color: #cbd5e1;
+}
+
+.test-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.framework-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.framework-selector label {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.framework-dropdown {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+  color: #f8fafc;
+  min-width: 150px;
+}
+
+.test-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-template {
+  background: #475569;
+  color: white;
+}
+
+.btn-template:hover:not(:disabled) {
+  background: #334155;
+}
+
+.btn-run-tests {
+  background: #10b981;
+  color: white;
+}
+
+.btn-run-tests:hover:not(:disabled) {
+  background: #059669;
+}
+
+.test-editor-section {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.test-editor-section .editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
+}
+
+.test-editor-section h4 {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 0.875rem;
+}
+
+.test-editor {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 1rem;
+  color: #f8fafc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+}
+
+.test-results {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.results-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.summary-card.total {
+  border-color: #3b82f6;
+}
+
+.summary-card.passed {
+  border-color: #10b981;
+}
+
+.summary-card.failed {
+  border-color: #ef4444;
+}
+
+.summary-card.duration {
+  border-color: #f59e0b;
+}
+
+.summary-card.framework {
+  border-color: #8b5cf6;
+}
+
+.summary-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.summary-card.total .summary-value {
+  color: #3b82f6;
+}
+
+.summary-card.passed .summary-value {
+  color: #10b981;
+}
+
+.summary-card.failed .summary-value {
+  color: #ef4444;
+}
+
+.summary-card.duration .summary-value {
+  color: #f59e0b;
+}
+
+.summary-card.framework .summary-value {
+  color: #8b5cf6;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.summary-label {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.coverage-report {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.coverage-report h5 {
+  margin: 0 0 1rem 0;
+  color: #cbd5e1;
+  font-size: 0.875rem;
+}
+
+.coverage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.coverage-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #0f172a;
+  border-radius: 0.25rem;
+}
+
+.coverage-label {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.coverage-value {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.detailed-results {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.detailed-results h5 {
+  margin: 0 0 1rem 0;
+  color: #cbd5e1;
+  font-size: 0.875rem;
+}
+
+.results-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.test-result {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 0.25rem;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.test-result.passed {
+  border-left: 4px solid #10b981;
+}
+
+.test-result.failed {
+  border-left: 4px solid #ef4444;
+}
+
+.test-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  color: #fecaca;
+  font-size: 0.875rem;
+}
+
+.test-logs {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.test-logs strong {
+  color: #dbeafe;
+  font-size: 0.875rem;
+}
+
+.test-logs ul {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.5rem;
+}
+
+.test-logs li {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+.test-guide {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.guide-header h4 {
+  margin: 0 0 1rem 0;
+  color: #cbd5e1;
+  font-size: 1rem;
+}
+
+.framework-guides {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.framework-guide {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.framework-guide h5 {
+  margin: 0 0 0.75rem 0;
+  color: #f8fafc;
+  font-size: 0.875rem;
+}
+
+.framework-guide ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.framework-guide li {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
 }
 

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Debugger } from './components/Debugger'
 import { NodeManager } from './components/NodeManager'
 import { SecurityAnalyzer } from './components/SecurityAnalyzer'
+import { TestRunner } from './components/TestRunner'
 import { WalletService, type WalletConnection } from './services/blockchain/WalletService'
 import { SolidityCompiler, type CompilationResult } from './services/compiler/SolidityCompiler'
 import './App.css'
@@ -21,9 +22,10 @@ const DEFAULT_LOCAL_PRIVATE_KEY =
   '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
 type Tab = 'editor' | 'nodes' | 'security' | 'debugger'
+type ExtendedTab = Tab | 'testing'
 
 function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('editor')
+  const [activeTab, setActiveTab] = useState<ExtendedTab>('editor')
 
   const [code, setCode] = useState<string>(`// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
@@ -232,6 +234,9 @@ contract HelloWorld {
             <button className={`tab ${activeTab === 'debugger' ? 'active' : ''}`} onClick={() => setActiveTab('debugger')}>
               Debugger
             </button>
+            <button className={`tab ${activeTab === 'testing' ? 'active' : ''}`} onClick={() => setActiveTab('testing')}>
+              Testing
+            </button>
           </div>
 
           <div className="wallet-section">
@@ -264,6 +269,8 @@ contract HelloWorld {
           />
         ) : activeTab === 'security' ? (
           <SecurityAnalyzer code={code} onVulnerabilityClick={handleVulnerabilityClick} />
+        ) : activeTab === 'testing' ? (
+          <TestRunner code={code} compilationResult={compilationResult} />
         ) : activeTab === 'debugger' ? (
           <Debugger code={code} compilationResult={compilationResult} />
         ) : (
@@ -286,6 +293,9 @@ contract HelloWorld {
                   </button>
                   <button onClick={() => setActiveTab('debugger')} className="btn btn-debugger" disabled={!compilationResult?.success}>
                     Debugger
+                  </button>
+                  <button onClick={() => setActiveTab('testing')} className="btn btn-testing" disabled={!compilationResult?.success}>
+                    Run Tests
                   </button>
                 </div>
               </div>

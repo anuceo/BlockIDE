@@ -1,5 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod compiler;
 mod evm;
 mod utils;
 
@@ -19,6 +20,8 @@ fn main() {
       utils::save_file,
       utils::load_file,
       utils::list_files,
+      // Compiler
+      compiler::compile_solidity_real,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

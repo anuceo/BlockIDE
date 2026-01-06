@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/core'
 import { useEffect, useMemo, useState } from 'react'
+import { NodeManager } from './components/NodeManager'
 import { WalletService, type WalletConnection } from './services/blockchain/WalletService'
 import { SolidityCompiler, type CompilationResult } from './services/compiler/SolidityCompiler'
 import './App.css'
@@ -35,6 +36,7 @@ contract HelloWorld {
   const [activeChain, setActiveChain] = useState<string>('ethereum')
   const [rpcUrl, setRpcUrl] = useState<string>('https://eth.llamarpc.com')
   const [privateKey, setPrivateKey] = useState<string>('')
+  const [chainIdNumber, setChainIdNumber] = useState<number>(CHAIN_ID_MAP.ethereum)
   const [deploymentStatus, setDeploymentStatus] = useState<string>('')
   const [deployedAddress, setDeployedAddress] = useState<string>('')
 
@@ -44,6 +46,7 @@ contract HelloWorld {
       setIsConnected(true)
       setActiveChain(connection.chain.id)
       setRpcUrl(connection.chain.rpcUrls?.[0] ?? 'https://eth.llamarpc.com')
+      setChainIdNumber(CHAIN_ID_MAP[connection.chain.id] ?? CHAIN_ID_MAP.ethereum)
     },
     [],
   )
@@ -132,7 +135,7 @@ contract HelloWorld {
           bytecode: contract.bin,
           rpc_url: rpcUrl,
           private_key: privateKey,
-          chain_id: CHAIN_ID_MAP[activeChain] ?? 1,
+          chain_id: chainIdNumber,
         })
         setDeployedAddress(result.address)
         setDeploymentStatus(`Deployed successfully! Tx: ${result.tx_hash}`)
@@ -256,6 +259,15 @@ contract HelloWorld {
                   <option value="ethereum-sepolia">Ethereum Sepolia</option>
                 </select>
               </div>
+            <div className="config-item">
+              <label>Chain ID (for private-key deploy)</label>
+              <input
+                type="number"
+                value={chainIdNumber}
+                onChange={(e) => setChainIdNumber(Number(e.target.value) || 1)}
+                min={1}
+              />
+            </div>
             </div>
 
             {deploymentStatus && (
@@ -273,6 +285,11 @@ contract HelloWorld {
 
         <div className="results-section">
           <h2>Results</h2>
+          <NodeManager
+            onUseRpcUrl={(u) => setRpcUrl(u)}
+            onUseChainId={(id) => setChainIdNumber(id)}
+            onUsePrivateKey={(pk) => setPrivateKey(pk)}
+          />
 
           {compilationResult && (
             <div className={`compilation-result ${compilationResult.success ? 'success' : 'error'}`}>

@@ -3,12 +3,17 @@
 mod compiler;
 mod evm;
 mod evm_simulator;
+mod node_manager;
 mod utils;
 
 fn main() {
   env_logger::init();
 
   tauri::Builder::default()
+    .setup(|app| {
+      app.manage(node_manager::NodeManager::new(app.handle().clone()));
+      Ok(())
+    })
     .invoke_handler(tauri::generate_handler![
       greet,
       // EVM commands (mock)
@@ -17,6 +22,12 @@ fn main() {
       evm::estimate_gas,
       // EVM simulation
       evm_simulator::simulate_contract_execution,
+      // Node management
+      node_manager::start_ganache,
+      node_manager::start_anvil,
+      node_manager::stop_node,
+      node_manager::get_nodes,
+      node_manager::get_default_accounts,
       // Utility commands
       utils::get_network_status,
       utils::check_wallet_connection,

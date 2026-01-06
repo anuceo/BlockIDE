@@ -28,6 +28,7 @@ npm install -g solc
 
 # Install security tools
 echo "Installing security tools..."
+npm install -g solhint
 npm install -g @trailofbits/eth-security-toolbox
 pip3 install slither-analyzer mythril
 

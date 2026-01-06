@@ -1,6 +1,7 @@
 import { invoke } from '@tauri-apps/api/core'
 import { useEffect, useMemo, useState } from 'react'
 import { NodeManager } from './components/NodeManager'
+import { SecurityAnalyzer } from './components/SecurityAnalyzer'
 import { WalletService, type WalletConnection } from './services/blockchain/WalletService'
 import { SolidityCompiler, type CompilationResult } from './services/compiler/SolidityCompiler'
 import './App.css'
@@ -21,7 +22,7 @@ const DEFAULT_LOCAL_PRIVATE_KEY =
 type Tab = 'editor' | 'nodes'
 
 function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('editor')
+  const [activeTab, setActiveTab] = useState<Tab | 'security'>('editor')
 
   const [code, setCode] = useState<string>(`// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
@@ -198,6 +199,20 @@ contract HelloWorld {
     }
   }
 
+  const handleVulnerabilityClick = (line: number) => {
+    const textarea = document.querySelector('.code-editor') as HTMLTextAreaElement | null
+    if (!textarea) return
+
+    const lines = textarea.value.split('\n')
+    let position = 0
+    for (let i = 0; i < Math.min(line - 1, lines.length); i++) {
+      position += lines[i].length + 1
+    }
+    textarea.focus()
+    textarea.setSelectionRange(position, position)
+    textarea.scrollTop = Math.max(0, (line - 3) * 20)
+  }
+
   return (
     <div className="app">
       <header className="header">
@@ -209,6 +224,9 @@ contract HelloWorld {
             </button>
             <button className={`tab ${activeTab === 'nodes' ? 'active' : ''}`} onClick={() => setActiveTab('nodes')}>
               Local Chains
+            </button>
+            <button className={`tab ${activeTab === 'security' ? 'active' : ''}`} onClick={() => setActiveTab('security')}>
+              Security
             </button>
           </div>
 
@@ -240,6 +258,8 @@ contract HelloWorld {
             }}
             onUsePrivateKey={(pk) => setPrivateKey(pk)}
           />
+        ) : activeTab === 'security' ? (
+          <SecurityAnalyzer code={code} onVulnerabilityClick={handleVulnerabilityClick} />
         ) : (
           <>
             <div className="editor-section">
@@ -254,6 +274,9 @@ contract HelloWorld {
                   </button>
                   <button onClick={handleDeploy} className="btn btn-deploy" disabled={!compilationResult?.success}>
                     Deploy
+                  </button>
+                  <button onClick={() => setActiveTab('security')} className="btn btn-security">
+                    Security Scan
                   </button>
                 </div>
               </div>

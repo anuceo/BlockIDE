@@ -1,0 +1,10 @@
+/workspace/src-tauri/target/release/deps/solana_pubsub_client-90f33eee8a8d61c9.d: /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-pubsub-client-2.3.13/src/lib.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-pubsub-client-2.3.13/src/nonblocking/mod.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-pubsub-client-2.3.13/src/nonblocking/pubsub_client.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-pubsub-client-2.3.13/src/pubsub_client.rs
+
+/workspace/src-tauri/target/release/deps/libsolana_pubsub_client-90f33eee8a8d61c9.rlib: /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-pubsub-client-2.3.13/src/lib.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-pubsub-client-2.3.13/src/nonblocking/mod.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-pubsub-client-2.3.13/src/nonblocking/pubsub_client.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-pubsub-client-2.3.13/src/pubsub_client.rs
+
+/workspace/src-tauri/target/release/deps/libsolana_pubsub_client-90f33eee8a8d61c9.rmeta: /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-pubsub-client-2.3.13/src/lib.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-pubsub-client-2.3.13/src/nonblocking/mod.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-pubsub-client-2.3.13/src/nonblocking/pubsub_client.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-pubsub-client-2.3.13/src/pubsub_client.rs
+
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-pubsub-client-2.3.13/src/lib.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-pubsub-client-2.3.13/src/nonblocking/mod.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-pubsub-client-2.3.13/src/nonblocking/pubsub_client.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-pubsub-client-2.3.13/src/pubsub_client.rs:

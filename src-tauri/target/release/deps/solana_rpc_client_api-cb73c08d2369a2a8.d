@@ -1,0 +1,10 @@
+/workspace/src-tauri/target/release/deps/solana_rpc_client_api-cb73c08d2369a2a8.d: /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-rpc-client-api-2.3.13/src/lib.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-rpc-client-api-2.3.13/src/client_error.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-rpc-client-api-2.3.13/src/custom_error.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-rpc-client-api-2.3.13/src/response.rs
+
+/workspace/src-tauri/target/release/deps/libsolana_rpc_client_api-cb73c08d2369a2a8.rlib: /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-rpc-client-api-2.3.13/src/lib.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-rpc-client-api-2.3.13/src/client_error.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-rpc-client-api-2.3.13/src/custom_error.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-rpc-client-api-2.3.13/src/response.rs
+
+/workspace/src-tauri/target/release/deps/libsolana_rpc_client_api-cb73c08d2369a2a8.rmeta: /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-rpc-client-api-2.3.13/src/lib.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-rpc-client-api-2.3.13/src/client_error.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-rpc-client-api-2.3.13/src/custom_error.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-rpc-client-api-2.3.13/src/response.rs
+
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-rpc-client-api-2.3.13/src/lib.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-rpc-client-api-2.3.13/src/client_error.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-rpc-client-api-2.3.13/src/custom_error.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-rpc-client-api-2.3.13/src/response.rs:

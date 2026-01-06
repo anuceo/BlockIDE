@@ -1,0 +1,13 @@
+/workspace/src-tauri/target/release/deps/digest-ea0a15cfdcb174e2.d: /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/lib.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/digest.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/dyn_digest.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/errors.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/fixed.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/variable.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/xof.rs
+
+/workspace/src-tauri/target/release/deps/libdigest-ea0a15cfdcb174e2.rlib: /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/lib.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/digest.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/dyn_digest.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/errors.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/fixed.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/variable.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/xof.rs
+
+/workspace/src-tauri/target/release/deps/libdigest-ea0a15cfdcb174e2.rmeta: /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/lib.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/digest.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/dyn_digest.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/errors.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/fixed.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/variable.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/xof.rs
+
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/lib.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/digest.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/dyn_digest.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/errors.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/fixed.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/variable.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.9.0/src/xof.rs:

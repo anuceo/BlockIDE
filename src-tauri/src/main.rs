@@ -6,6 +6,8 @@ mod evm_simulator;
 mod node_manager;
 mod utils;
 
+use tauri::Manager;
+
 fn main() {
   env_logger::init();
 

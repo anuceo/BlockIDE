@@ -789,6 +789,7 @@ dependencies = [
  "chrono",
  "env_logger",
  "ethers",
+ "ethers-signers",
  "hex",
  "log",
  "once_cell",

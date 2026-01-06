@@ -10,9 +10,19 @@ const CHAIN_ID_MAP: Record<string, number> = {
   polygon: 137,
   bsc: 56,
   'ethereum-sepolia': 11155111,
+  local: 1337,
 }
 
+const DEFAULT_LOCAL_RPC = 'http://127.0.0.1:8545'
+// Hardhat/Anvil default account #1 for the standard test mnemonic.
+const DEFAULT_LOCAL_PRIVATE_KEY =
+  '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+
+type Tab = 'editor' | 'nodes'
+
 function App() {
+  const [activeTab, setActiveTab] = useState<Tab>('editor')
+
   const [code, setCode] = useState<string>(`// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
@@ -33,10 +43,10 @@ contract HelloWorld {
 
   const [walletAddress, setWalletAddress] = useState<string>('')
   const [isConnected, setIsConnected] = useState(false)
-  const [activeChain, setActiveChain] = useState<string>('ethereum')
-  const [rpcUrl, setRpcUrl] = useState<string>('https://eth.llamarpc.com')
+  const [activeChain, setActiveChain] = useState<string>('local')
+  const [rpcUrl, setRpcUrl] = useState<string>(DEFAULT_LOCAL_RPC)
   const [privateKey, setPrivateKey] = useState<string>('')
-  const [chainIdNumber, setChainIdNumber] = useState<number>(CHAIN_ID_MAP.ethereum)
+  const [chainIdNumber, setChainIdNumber] = useState<number>(CHAIN_ID_MAP.local)
   const [deploymentStatus, setDeploymentStatus] = useState<string>('')
   const [deployedAddress, setDeployedAddress] = useState<string>('')
 
@@ -85,6 +95,10 @@ contract HelloWorld {
 
   const handleConnectWallet = async () => {
     try {
+      if (activeChain === 'local') {
+        alert('Wallet connect is for public chains. Use Local Chains tab + private key for local dev.')
+        return
+      }
       await WalletService.connectEthereum(activeChain)
     } catch (error: any) {
       console.error('Failed to connect wallet:', error)
@@ -106,8 +120,8 @@ contract HelloWorld {
       alert('Please compile the contract first')
       return
     }
-    if (!privateKey && !isConnected) {
-      alert('Please either connect a wallet or provide a private key')
+    if (!privateKey && !isConnected && activeChain !== 'local') {
+      alert('Please either connect a wallet, provide a private key, or use local chain')
       return
     }
 
@@ -130,11 +144,20 @@ contract HelloWorld {
           value: '0x0',
         })
         setDeploymentStatus(`Transaction sent: ${txHash}`)
+      } else if (activeChain === 'local') {
+        const result = await invoke<any>('deploy_contract', {
+          bytecode: contract.bin,
+          rpc_url: rpcUrl,
+          private_key: (privateKey || DEFAULT_LOCAL_PRIVATE_KEY).trim(),
+          chain_id: CHAIN_ID_MAP.local,
+        })
+        setDeployedAddress(result.address)
+        setDeploymentStatus(`Deployed successfully to local chain! Tx: ${result.tx_hash}`)
       } else {
         const result = await invoke<any>('deploy_contract', {
           bytecode: contract.bin,
           rpc_url: rpcUrl,
-          private_key: privateKey,
+          private_key: privateKey.trim(),
           chain_id: chainIdNumber,
         })
         setDeployedAddress(result.address)
@@ -180,162 +203,151 @@ contract HelloWorld {
     <div className="app">
       <header className="header">
         <h1>Blockchain IDE</h1>
-        <div className="wallet-section">
-          <select value={activeChain} onChange={(e) => setActiveChain(e.target.value)} className="chain-select">
-            <option value="ethereum">Ethereum</option>
-            <option value="polygon">Polygon</option>
-            <option value="bsc">BSC</option>
-            <option value="ethereum-sepolia">Sepolia</option>
-          </select>
-
-          {isConnected ? (
-            <>
-              <span className="wallet-address">
-                {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-              </span>
-              <button onClick={handleDisconnectWallet} className="btn btn-disconnect">
-                Disconnect
-              </button>
-            </>
-          ) : (
-            <button onClick={handleConnectWallet} className="btn btn-connect">
-              Connect Wallet
+        <div className="header-actions">
+          <div className="tabs">
+            <button className={`tab ${activeTab === 'editor' ? 'active' : ''}`} onClick={() => setActiveTab('editor')}>
+              Editor
             </button>
-          )}
+            <button className={`tab ${activeTab === 'nodes' ? 'active' : ''}`} onClick={() => setActiveTab('nodes')}>
+              Local Chains
+            </button>
+          </div>
+
+          <div className="wallet-section">
+            {isConnected ? (
+              <>
+                <span className="wallet-address">
+                  {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+                </span>
+                <button onClick={handleDisconnectWallet} className="btn btn-disconnect">
+                  Disconnect
+                </button>
+              </>
+            ) : (
+              <button onClick={handleConnectWallet} className="btn btn-connect">
+                Connect Wallet
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
       <main className="main">
-        <div className="editor-section">
-          <div className="editor-header">
-            <h2>Smart Contract Editor</h2>
-            <div className="editor-actions">
-              <button onClick={handleCompile} className="btn btn-compile" disabled={isCompiling}>
-                {isCompiling ? 'Compiling…' : 'Compile'}
-              </button>
-              <button onClick={handleSimulate} className="btn btn-simulate" disabled={!compilationResult?.success}>
-                Simulate
-              </button>
-              <button
-                onClick={handleDeploy}
-                className="btn btn-deploy"
-                disabled={!compilationResult?.success}
-              >
-                Deploy
-              </button>
-            </div>
-          </div>
-
-          <textarea
-            className="code-editor"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            rows={20}
-            spellCheck={false}
-          />
-
-          <div className="config-section">
-            <h3>Deployment Configuration</h3>
-            <div className="config-grid">
-              <div className="config-item">
-                <label>RPC URL</label>
-                <input value={rpcUrl} onChange={(e) => setRpcUrl(e.target.value)} placeholder="https://eth.llamarpc.com" />
-              </div>
-              <div className="config-item">
-                <label>Private Key (optional)</label>
-                <input
-                  type="password"
-                  value={privateKey}
-                  onChange={(e) => setPrivateKey(e.target.value)}
-                  placeholder="0x..."
-                />
-              </div>
-              <div className="config-item">
-                <label>Chain</label>
-                <select value={activeChain} onChange={(e) => setActiveChain(e.target.value)}>
-                  <option value="ethereum">Ethereum</option>
-                  <option value="polygon">Polygon</option>
-                  <option value="bsc">BNB Smart Chain</option>
-                  <option value="ethereum-sepolia">Ethereum Sepolia</option>
-                </select>
-              </div>
-            <div className="config-item">
-              <label>Chain ID (for private-key deploy)</label>
-              <input
-                type="number"
-                value={chainIdNumber}
-                onChange={(e) => setChainIdNumber(Number(e.target.value) || 1)}
-                min={1}
-              />
-            </div>
-            </div>
-
-            {deploymentStatus && (
-              <div className="deployment-status">
-                {deploymentStatus}
-                {deployedAddress && (
-                  <div className="deployed-address">
-                    Contract: <code>{deployedAddress}</code>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="results-section">
-          <h2>Results</h2>
+        {activeTab === 'nodes' ? (
           <NodeManager
             onUseRpcUrl={(u) => setRpcUrl(u)}
             onUseChainId={(id) => setChainIdNumber(id)}
             onUsePrivateKey={(pk) => setPrivateKey(pk)}
           />
-
-          {compilationResult && (
-            <div className={`compilation-result ${compilationResult.success ? 'success' : 'error'}`}>
-              <h3>Compilation {compilationResult.success ? '✅ Success' : '❌ Failed'}</h3>
-
-              {!compilationResult.success && compilationResult.errors.length > 0 && (
-                <div className="errors">
-                  <h4>Errors</h4>
-                  <ul>
-                    {compilationResult.errors.map((error, idx) => (
-                      <li key={idx}>{error}</li>
-                    ))}
-                  </ul>
+        ) : (
+          <>
+            <div className="editor-section">
+              <div className="editor-header">
+                <h2>Smart Contract Editor</h2>
+                <div className="editor-actions">
+                  <button onClick={handleCompile} className="btn btn-compile" disabled={isCompiling}>
+                    {isCompiling ? 'Compiling…' : 'Compile'}
+                  </button>
+                  <button onClick={handleSimulate} className="btn btn-simulate" disabled={!compilationResult?.success}>
+                    Simulate
+                  </button>
+                  <button onClick={handleDeploy} className="btn btn-deploy" disabled={!compilationResult?.success}>
+                    Deploy
+                  </button>
                 </div>
-              )}
+              </div>
 
-              {compilationResult.success && Object.keys(compilationResult.contracts).length > 0 && (
-                <div className="contracts">
-                  <h4>Compiled Contracts</h4>
-                  <ul>
-                    {Object.entries(compilationResult.contracts).map(([name, contract]) => (
-                      <li key={name}>
-                        <strong>{name}</strong>
-                        <div className="contract-info">
-                          <span>Bytecode: {contract.bin.length} hex chars</span>
-                          <span>ABI: {contract.abi?.length ?? 0} items</span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+              <textarea className="code-editor" value={code} onChange={(e) => setCode(e.target.value)} rows={20} spellCheck={false} />
+
+              <div className="config-section">
+                <h3>Deployment Configuration</h3>
+                <div className="config-grid">
+                  <div className="config-item">
+                    <label>Target Chain:</label>
+                    <select value={activeChain} onChange={(e) => {
+                      const next = e.target.value
+                      setActiveChain(next)
+                      setChainIdNumber(CHAIN_ID_MAP[next] ?? 1)
+                      if (next === 'local') setRpcUrl(DEFAULT_LOCAL_RPC)
+                    }}>
+                      <option value="local">Local Development Chain</option>
+                      <option value="ethereum">Ethereum Mainnet</option>
+                      <option value="polygon">Polygon</option>
+                      <option value="bsc">BNB Smart Chain</option>
+                      <option value="ethereum-sepolia">Ethereum Sepolia</option>
+                    </select>
+                  </div>
+                  <div className="config-item">
+                    <label>RPC URL:</label>
+                    <input type="text" value={rpcUrl} onChange={(e) => setRpcUrl(e.target.value)} placeholder={DEFAULT_LOCAL_RPC} />
+                  </div>
+                  <div className="config-item">
+                    <label>Private Key (optional):</label>
+                    <input type="password" value={privateKey} onChange={(e) => setPrivateKey(e.target.value)} placeholder="0x..." />
+                  </div>
                 </div>
-              )}
 
-              {compilationResult.warnings.length > 0 && (
-                <div className="warnings">
-                  <h4>Warnings</h4>
-                  <ul>
-                    {compilationResult.warnings.map((w, idx) => (
-                      <li key={idx}>{w}</li>
-                    ))}
-                  </ul>
+                {activeChain === 'local' && (
+                  <div className="local-chain-info">
+                    <p>⚠️ Using local chain. Make sure Ganache or Anvil is running.</p>
+                    <p>
+                      Go to <strong>Local Chains</strong> tab to start a local node.
+                    </p>
+                  </div>
+                )}
+
+                {deploymentStatus && (
+                  <div className="deployment-status">
+                    {deploymentStatus}
+                    {deployedAddress && (
+                      <div className="deployed-address">
+                        Contract: <code>{deployedAddress}</code>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="results-section">
+              <h2>Results</h2>
+
+              {compilationResult && (
+                <div className={`compilation-result ${compilationResult.success ? 'success' : 'error'}`}>
+                  <h3>Compilation {compilationResult.success ? '✅ Success' : '❌ Failed'}</h3>
+
+                  {!compilationResult.success && compilationResult.errors.length > 0 && (
+                    <div className="errors">
+                      <h4>Errors</h4>
+                      <ul>
+                        {compilationResult.errors.map((error, idx) => (
+                          <li key={idx}>{error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {compilationResult.success && Object.keys(compilationResult.contracts).length > 0 && (
+                    <div className="contracts">
+                      <h4>Compiled Contracts</h4>
+                      <ul>
+                        {Object.entries(compilationResult.contracts).map(([name, contract]) => (
+                          <li key={name}>
+                            <strong>{name}</strong>
+                            <div className="contract-info">
+                              <span>Bytecode: {contract.bin.length} bytes</span>
+                              <span>ABI: {contract.abi?.length || 0} items</span>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          )}
-        </div>
+          </>
+        )}
       </main>
     </div>
   )

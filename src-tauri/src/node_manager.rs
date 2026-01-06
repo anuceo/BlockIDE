@@ -1,4 +1,4 @@
-use ethers_signers::{coins_bip39::English, MnemonicBuilder};
+use ethers_signers::{coins_bip39::English, MnemonicBuilder, Signer};
 use serde::Serialize;
 use std::io::{BufRead, BufReader};
 use std::net::TcpListener;

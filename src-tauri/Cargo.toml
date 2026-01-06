@@ -1,0 +1,40 @@
+[package]
+name = "blockchain-ide"
+version = "0.3.0"
+description = "A revolutionary blockchain IDE"
+authors = ["Your Name"]
+license = "MIT"
+repository = "https://github.com/yourusername/blockchain-ide"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2.5.3", features = [] }
+
+[dependencies]
+tauri = { version = "2.9.5", features = [] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_with = "3.0"
+
+# Blockchain & EVM (added back once pinned to Rust/Cargo compatibility)
+
+# IPFS
+reqwest = { version = "0.11", features = ["json"] }
+
+# Plugin system (WASM execution will be added later)
+sha2 = "0.10"
+hex = "0.4"
+
+# Utils
+once_cell = "1.18"
+thiserror = "1.0"
+log = "0.4"
+env_logger = "0.10"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+
+[features]
+default = []
+
+[dev-dependencies]
+tauri = { version = "2.9.5", features = [] }
+

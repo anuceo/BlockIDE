@@ -1,0 +1,78 @@
+.smart-contract-editor {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #1a1a1a;
+}
+
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #222;
+}
+
+.language-selector {
+  padding: 6px 10px;
+  background: #2a2a2a;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: #fff;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #2a2a2a;
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #333;
+}
+
+.btn-compile {
+  background: #3a4bdc;
+}
+
+.btn-deploy {
+  background: #d14b6a;
+}
+
+.btn-analyze {
+  background: #1e88e5;
+}
+
+.btn-theme {
+  background: #444;
+}
+
+.editor-container {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.editor-loading {
+  position: absolute;
+  z-index: 10;
+  top: 12px;
+  right: 12px;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 12px;
+}
+
